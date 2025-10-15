@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全局样式 */
+body {
+  font-family: 'Noto Serif SC', serif;
+  background-color: #f5f1dc;
+  color: #2F1B0A;
+  min-height: 1024px;
+}
+
+#app {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+/* 古风背景样式 */
+.ancient-bg {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNmNWYxZGMiLz48cGF0aCBkPSJNMCAwTDUwIDUwTDEwMCAwWiIgZmlsbD0iI2U4ZTRjOSIvPjwvc3ZnPg==');
+  background-size: cover;
+  background-position: center;
+}
+
+/* 卷轴样式 */
+.scroll-style {
+  background: linear-gradient(90deg, #f5f1dc 0%, #e8e4c9 50%, #f5f1dc 100%);
+  border-left: 8px solid #8B4513;
+  border-right: 8px solid #8B4513;
+  box-shadow: 0 4px 20px rgba(139, 69, 19, 0.3);
+}
+
+/* 按钮样式 */
+.btn-primary {
+  @apply bg-primary hover:bg-secondary text-white px-6 py-3 rounded-button transition-colors duration-300;
+}
+
+.btn-secondary {
+  @apply bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 rounded-button transition-colors duration-300;
+}
+
+/* 卡片样式 */
+.poem-card {
+  @apply bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200 rounded-lg shadow-lg p-6 transition-all duration-300;
+}
+
+.poem-card:hover {
+  @apply transform scale-105 shadow-xl;
+}
+
+/* 文本样式 */
+.poem-title {
+  @apply text-2xl font-bold text-dark mb-4 text-center;
+}
+
+.poem-content {
+  @apply text-lg leading-relaxed text-gray-700 text-justify;
+}
+
+.poem-author {
+  @apply text-sm text-gray-600 italic text-right mt-4;
+}
+
+/* 导航栏样式 */
+.nav-ancient {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  border-bottom: 3px solid #D2691E;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .poem-content {
+    @apply text-base;
+  }
+  
+  .poem-title {
+    @apply text-xl;
+  }
+}
