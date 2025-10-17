@@ -4,6 +4,9 @@
     <!-- HeroSection已经有pt-20处理导航栏间距 -->
     <HeroSection />
     
+    <!-- AI聊天助手悬浮组件 -->
+    <AIChatAssistant />
+    
     <!-- 搜索区域 -->
     <section id="search" class="py-16 bg-white bg-opacity-90">
       <div class="container mx-auto px-6">
@@ -95,6 +98,7 @@ import HeroSection from '../components/HeroSection.vue'
 import PoemList from '../components/PoemList.vue'
 import PoetIntroduction from '../components/PoetIntroduction.vue'
 import AppFooter from '../components/AppFooter.vue'
+import AIChatAssistant from '../components/AIChatAssistant.vue'
 import { searchService } from '../services/searchService.js'
 import { useRouter } from 'vue-router'
 
@@ -105,7 +109,8 @@ export default {
     HeroSection,
     PoemList,
     PoetIntroduction,
-    AppFooter
+    AppFooter,
+    AIChatAssistant
   },
   setup() {
     const router = useRouter()
