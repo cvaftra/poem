@@ -1,5 +1,5 @@
 {
-  "name": "古诗词AI智能聊天助手（DeepSeek版-正确）",
+  "name": "古诗词AI智能聊天助手（DeepSeek版-最终可用）",
   "nodes": [
     {
       "parameters": {
@@ -53,7 +53,30 @@
         "sendQuery": false,
         "sendBody": true,
         "bodyContentType": "json",
-        "jsonBody": "={{ {\n  \"model\": \"deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"你是一个专业的古诗词AI助手，专门帮助用户理解和欣赏中国古典诗词。请用中文回答，语气亲切专业。根据用户意图提供相应的帮助：\\\\n\\\\n1. 如果是搜索意图：帮助用户搜索相关诗词，提供准确的诗词信息\\\\n2. 如果是赏析意图：对诗词进行深入分析和解读，包括创作背景、艺术特色等\\\\n3. 如果是推荐意图：根据用户需求推荐合适的诗词，并说明推荐理由\\\\n4. 如果是通用意图：回答用户关于古诗词的各种问题\\\\n\\\\n请确保回答准确、专业、易懂。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"用户问题：\" + $json.userInput + \"\\\\n用户意图：\" + $json.intent + \"\\\\n请根据以上信息提供专业的古诗词帮助。\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 2000,\n  \"stream\": false\n} }}"
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "deepseek-chat"
+            },
+            {
+              "name": "messages",
+              "value": "=[\n  {\n    \"role\": \"system\",\n    \"content\": \"你是一个专业的古诗词AI助手，专门帮助用户理解和欣赏中国古典诗词。请用中文回答，语气亲切专业。根据用户意图提供相应的帮助：\\\\n\\\\n1. 如果是搜索意图：帮助用户搜索相关诗词，提供准确的诗词信息\\\\n2. 如果是赏析意图：对诗词进行深入分析和解读，包括创作背景、艺术特色等\\\\n3. 如果是推荐意图：根据用户需求推荐合适的诗词，并说明推荐理由\\\\n4. 如果是通用意图：回答用户关于古诗词的各种问题\\\\n\\\\n请确保回答准确、专业、易懂。\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"用户问题：\" + $json.userInput + \"\\\\n用户意图：\" + $json.intent + \"\\\\n请根据以上信息提供专业的古诗词帮助。\"\n  }\n]"
+            },
+            {
+              "name": "temperature",
+              "value": "0.7"
+            },
+            {
+              "name": "max_tokens",
+              "value": "2000"
+            },
+            {
+              "name": "stream",
+              "value": "false"
+            }
+          ]
+        }
       },
       "id": "3",
       "name": "DeepSeek AI生成回答",
