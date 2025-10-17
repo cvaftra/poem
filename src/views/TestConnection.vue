@@ -7,16 +7,16 @@
       <p><strong>Anon Key:</strong> 已配置</p>
       <p><strong>Service Role Key:</strong> 已配置（用于服务端操作）</p>
     </div>
-    
-    <button @click="handleTestConnection" :disabled="testing" class="test-btn">
+
+    <button :disabled="testing" class="test-btn" @click="handleTestConnection">
       {{ testing ? '测试中...' : '测试数据库连接' }}
     </button>
-    
+
     <div v-if="result" class="result" :class="{ success: result.success, error: !result.success }">
       <h3>测试结果：</h3>
       <p>{{ result.message }}</p>
     </div>
-    
+
     <div class="usage-examples">
       <h3>使用示例：</h3>
       <pre><code>import { getSupabaseClient } from '@/utils/supabase'
@@ -46,7 +46,7 @@ const result = ref(null)
 const handleTestConnection = async () => {
   testing.value = true
   result.value = null
-  
+
   try {
     const connectionResult = await testConnection()
     result.value = connectionResult

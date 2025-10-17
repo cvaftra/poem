@@ -1,0 +1,151 @@
+{
+  "name": "古诗词AI智能聊天助手（DeepSeek版-正确）",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "/api/chat",
+        "methods": [
+          "POST"
+        ],
+        "responseMode": "responseNode",
+        "responseData": "firstEntryJson"
+      },
+      "id": "1",
+      "name": "Webhook接收消息",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const message = $input.first().json;\n\n// 验证消息格式\nif (!message) {\n  throw new Error('无效的消息格式：消息为空');\n}\n\n// 支持多种消息格式\nconst userInput = String(message.content || message.text || message.message || message.query || '');\nconst userId = message.userId || message.user_id || 'anonymous';\nconst sessionId = message.sessionId || message.session_id || Date.now().toString();\n\n// 检查用户输入是否为空\nif (!userInput || userInput.trim() === '') {\n  throw new Error('用户输入内容不能为空');\n}\n\nconst trimmedInput = userInput.trim();\n\n// 分析用户意图\nlet intent = 'general';\nconst poemKeywords = ['诗', '词', '诗人', '朝代', '李白', '杜甫', '苏轼', '唐诗', '宋词'];\nconst searchKeywords = ['搜索', '查找', '找', '查询', '搜'];\nconst analysisKeywords = ['赏析', '解释', '含义', '背景', '分析', '解读'];\nconst recommendationKeywords = ['推荐', '建议', '有什么', '哪些', '介绍'];\n\nif (poemKeywords.some(keyword => trimmedInput.includes(keyword))) {\n  intent = 'poem_related';\n  \n  if (searchKeywords.some(keyword => trimmedInput.includes(keyword))) {\n    intent = 'poem_search';\n  } else if (analysisKeywords.some(keyword => trimmedInput.includes(keyword))) {\n    intent = 'poem_analysis';\n  } else if (recommendationKeywords.some(keyword => trimmedInput.includes(keyword))) {\n    intent = 'poem_recommendation';\n  }\n}\n\nreturn {\n  userInput: trimmedInput,\n  userId,\n  sessionId,\n  intent,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "2",
+      "name": "消息预处理和意图识别",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/v1/chat/completions",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.DEEPSEEK_API_KEY }}"
+            }
+          ]
+        },
+        "sendQuery": false,
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{ {\n  \"model\": \"deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"你是一个专业的古诗词AI助手，专门帮助用户理解和欣赏中国古典诗词。请用中文回答，语气亲切专业。根据用户意图提供相应的帮助：\\\\n\\\\n1. 如果是搜索意图：帮助用户搜索相关诗词，提供准确的诗词信息\\\\n2. 如果是赏析意图：对诗词进行深入分析和解读，包括创作背景、艺术特色等\\\\n3. 如果是推荐意图：根据用户需求推荐合适的诗词，并说明推荐理由\\\\n4. 如果是通用意图：回答用户关于古诗词的各种问题\\\\n\\\\n请确保回答准确、专业、易懂。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"用户问题：\" + $json.userInput + \"\\\\n用户意图：\" + $json.intent + \"\\\\n请根据以上信息提供专业的古诗词帮助。\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 2000,\n  \"stream\": false\n} }}"
+      },
+      "id": "3",
+      "name": "DeepSeek AI生成回答",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\n\n// 提取AI回答\nlet aiResponse = '';\nlet processedData = null;\n\nfor (const item of inputData) {\n  if (item.json && item.json.choices && item.json.choices[0] && item.json.choices[0].message) {\n    aiResponse = item.json.choices[0].message.content;\n  }\n  if (item.json && item.json.userInput) {\n    processedData = item.json;\n  }\n}\n\nif (!aiResponse) {\n  aiResponse = '抱歉，我暂时无法回答这个问题。您可以尝试询问关于古诗词的搜索、赏析或推荐。';\n}\n\nconst response = {\n  success: true,\n  data: {\n    response: aiResponse,\n    type: 'text',\n    timestamp: new Date().toISOString(),\n    sessionId: processedData?.sessionId,\n    intent: processedData?.intent,\n    originalQuestion: processedData?.userInput\n  }\n};\n\nreturn response;"
+      },
+      "id": "4",
+      "name": "构建响应数据",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "responseMode": "lastNode",
+        "responseData": "={{ $json }}",
+        "responseCode": "200"
+      },
+      "id": "5",
+      "name": "返回响应给用户",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook接收消息": {
+      "main": [
+        [
+          {
+            "node": "消息预处理和意图识别",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "消息预处理和意图识别": {
+      "main": [
+        [
+          {
+            "node": "DeepSeek AI生成回答",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek AI生成回答": {
+      "main": [
+        [
+          {
+            "node": "构建响应数据",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "构建响应数据": {
+      "main": [
+        [
+          {
+            "node": "返回响应给用户",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-10-17T02:00:00.000Z",
+  "versionId": "1"
+}

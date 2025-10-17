@@ -1,0 +1,74 @@
+/* 导航栏相关样式优化 */
+
+/* 为固定导航栏添加全局样式 */
+.navbar-fixed-space {
+  height: 5rem; /* 对应 h-20 */
+}
+
+/* 导航栏动画效果 */
+.nav-ancient {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  border-bottom: 3px solid #D2691E;
+  transition: all 0.3s ease;
+}
+
+/* 导航栏滚动效果 */
+.nav-ancient.scrolled {
+  background: linear-gradient(135deg, #6B3300 0%, #8B4513 100%);
+  box-shadow: 0 4px 20px rgba(139, 69, 19, 0.4);
+}
+
+/* 移动端菜单优化 */
+@media (max-width: 768px) {
+  .nav-ancient {
+    padding: 0.5rem 0;
+  }
+  
+  .navbar-fixed-space {
+    height: 4rem; /* 移动端较小的高度 */
+  }
+}
+
+/* 导航栏按钮悬停效果 */
+.nav-button {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.nav-button:hover::before {
+  left: 100%;
+}
+
+/* 确保页面内容不被导航栏遮挡 */
+.page-content {
+  min-height: calc(100vh - 5rem);
+}
+
+/* 用户中心页面特定样式 */
+.user-center-page {
+  padding-top: 5rem;
+  min-height: 100vh;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .page-content {
+    min-height: calc(100vh - 4rem);
+  }
+  
+  .user-center-page {
+    padding-top: 4rem;
+  }
+}

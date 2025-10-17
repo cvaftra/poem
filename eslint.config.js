@@ -5,15 +5,15 @@ import prettier from '@vue/eslint-config-prettier'
 export default [
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{js,mjs,jsx,vue}'],
+    files: ['**/*.{js,mjs,jsx,vue}']
   },
 
   {
     name: 'app/files-to-ignore',
-    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
+    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**']
   },
 
   js.configs.recommended,
   ...vue.configs['flat/recommended'],
-  prettier,
+  prettier
 ]

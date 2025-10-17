@@ -63,10 +63,30 @@ body {
   @apply text-sm text-gray-600 italic text-right mt-4;
 }
 
-/* 导航栏样式 */
+/* 导航栏样式优化 */
 .nav-ancient {
   background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
   border-bottom: 3px solid #D2691E;
+  transition: all 0.3s ease;
+}
+
+/* 导航栏滚动效果 */
+.nav-ancient.scrolled {
+  background: linear-gradient(135deg, #6B3300 0%, #8B4513 100%);
+  box-shadow: 0 4px 20px rgba(139, 69, 19, 0.4);
+}
+
+/* 为固定导航栏添加页面内容间距 */
+.page-with-fixed-nav {
+  padding-top: 5rem; /* 对应 h-20 */
+  min-height: 100vh;
+}
+
+/* 移动端导航栏间距调整 */
+@media (max-width: 768px) {
+  .page-with-fixed-nav {
+    padding-top: 4rem;
+  }
 }
 
 /* 响应式调整 */
@@ -77,5 +97,9 @@ body {
   
   .poem-title {
     @apply text-xl;
+  }
+  
+  .nav-ancient {
+    padding: 0.5rem 0;
   }
 }

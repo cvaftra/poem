@@ -1,149 +1,157 @@
--- 古诗词赏析网站 MySQL 数据库表结构设计
--- 创建数据库
-CREATE DATABASE IF NOT EXISTS poem_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE poem_app;
+-- 古诗词赏析网站数据库表结构设计
+-- 创建数据库（如果已存在则删除重建）
+-- 注意：以下为通用SQL语法，请根据实际数据库类型调整
+-- DROP DATABASE IF EXISTS poem_app;
+-- CREATE DATABASE poem_app;
+-- USE poem_app;
+
+-- 创建数据库连接后，请确保使用正确的数据库
 
 -- 1. 朝代表 (dynasties)
 CREATE TABLE dynasties (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL COMMENT '朝代名称',
-    start_year INT COMMENT '起始年份',
-    end_year INT COMMENT '结束年份',
-    description TEXT COMMENT '朝代简介',
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    start_year INT,
+    end_year INT,
+    description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_dynasty_name (name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='朝代信息表';
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (name)
+);
 
 -- 2. 诗人表 (poets)
 CREATE TABLE poets (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL COMMENT '诗人姓名',
-    pseudonym VARCHAR(100) COMMENT '字号',
-    dynasty_id INT NOT NULL COMMENT '所属朝代',
-    birth_year INT COMMENT '出生年份',
-    death_year INT COMMENT '去世年份',
-    birthplace VARCHAR(200) COMMENT '出生地',
-    introduction TEXT COMMENT '诗人简介',
-    style VARCHAR(100) COMMENT '诗风特点',
-    honorific_title VARCHAR(100) COMMENT '尊称（如诗仙、诗圣）',
-    portrait_url VARCHAR(500) COMMENT '诗人画像URL',
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    pseudonym VARCHAR(100),
+    dynasty_id INT NOT NULL,
+    birth_year INT,
+    death_year INT,
+    birthplace VARCHAR(200),
+    introduction TEXT,
+    style VARCHAR(100),
+    honorific_title VARCHAR(100),
+    portrait_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (dynasty_id) REFERENCES dynasties(id) ON DELETE RESTRICT,
-    UNIQUE KEY uk_poet_name (name, dynasty_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='诗人信息表';
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (dynasty_id) REFERENCES dynasties(id),
+    UNIQUE (name, dynasty_id)
+);
 
 -- 3. 诗词表 (poems) - 核心表
 CREATE TABLE poems (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(200) NOT NULL COMMENT '诗词标题',
-    poet_id INT NOT NULL COMMENT '作者ID',
-    dynasty_id INT NOT NULL COMMENT '创作朝代',
-    content_type ENUM('诗', '词', '曲', '赋') DEFAULT '诗' COMMENT '诗词类型',
-    content TEXT NOT NULL COMMENT '诗词内容（JSON格式存储每行）',
-    full_content TEXT NOT NULL COMMENT '完整诗词内容',
-    translation TEXT COMMENT '现代译文',
-    analysis TEXT COMMENT '诗词赏析',
-    background TEXT COMMENT '创作背景',
-    theme VARCHAR(100) COMMENT '主题',
-    rhyme_scheme VARCHAR(100) COMMENT '韵律格式',
-    word_count INT COMMENT '字数',
-    line_count INT COMMENT '行数',
-    difficulty_level ENUM('简单', '中等', '困难') DEFAULT '中等' COMMENT '难度等级',
-    popularity_score INT DEFAULT 0 COMMENT '受欢迎度评分',
-    view_count INT DEFAULT 0 COMMENT '浏览次数',
-    favorite_count INT DEFAULT 0 COMMENT '收藏次数',
-    is_featured BOOLEAN DEFAULT FALSE COMMENT '是否精选',
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    poet_id INT NOT NULL,
+    dynasty_id INT NOT NULL,
+    content_type VARCHAR(10) DEFAULT '诗' CHECK (content_type IN ('诗', '词', '曲', '赋')),
+    content TEXT NOT NULL,
+    full_content TEXT NOT NULL,
+    translation TEXT,
+    analysis TEXT,
+    background TEXT,
+    theme VARCHAR(100),
+    rhyme_scheme VARCHAR(100),
+    word_count INT,
+    line_count INT,
+    difficulty_level VARCHAR(10) DEFAULT '中等' CHECK (difficulty_level IN ('简单', '中等', '困难')),
+    popularity_score INT DEFAULT 0,
+    view_count INT DEFAULT 0,
+    favorite_count INT DEFAULT 0,
+    is_featured BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (poet_id) REFERENCES poets(id) ON DELETE RESTRICT,
-    FOREIGN KEY (dynasty_id) REFERENCES dynasties(id) ON DELETE RESTRICT,
-    INDEX idx_poet_dynasty (poet_id, dynasty_id),
-    INDEX idx_title (title),
-    INDEX idx_featured (is_featured),
-    INDEX idx_popularity (popularity_score)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='诗词信息表';
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (poet_id) REFERENCES poets(id),
+    FOREIGN KEY (dynasty_id) REFERENCES dynasties(id)
+);
+
+-- 为诗词表创建索引
+CREATE INDEX idx_poems_poet_dynasty ON poems(poet_id, dynasty_id);
+CREATE INDEX idx_poems_title ON poems(title);
+CREATE INDEX idx_poems_featured ON poems(is_featured);
+CREATE INDEX idx_poems_popularity ON poems(popularity_score);
 
 -- 4. 标签表 (tags)
 CREATE TABLE tags (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL COMMENT '标签名称',
-    category VARCHAR(50) COMMENT '标签分类',
-    description TEXT COMMENT '标签描述',
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    category VARCHAR(50),
+    description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_tag_name (name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='标签表';
+    UNIQUE (name)
+);
 
 -- 5. 诗词标签关联表 (poem_tags)
 CREATE TABLE poem_tags (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    poem_id INT NOT NULL COMMENT '诗词ID',
-    tag_id INT NOT NULL COMMENT '标签ID',
+    id SERIAL PRIMARY KEY,
+    poem_id INT NOT NULL,
+    tag_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (poem_id) REFERENCES poems(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE,
-    UNIQUE KEY uk_poem_tag (poem_id, tag_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='诗词标签关联表';
+    UNIQUE (poem_id, tag_id)
+);
 
 -- 6. 用户表 (users)
 CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL COMMENT '用户名',
-    email VARCHAR(100) NOT NULL COMMENT '邮箱',
-    password_hash VARCHAR(255) NOT NULL COMMENT '密码哈希',
-    avatar_url VARCHAR(500) COMMENT '头像URL',
-    bio TEXT COMMENT '个人简介',
-    role ENUM('admin', 'user') DEFAULT 'user' COMMENT '用户角色',
-    is_active BOOLEAN DEFAULT TRUE COMMENT '是否激活',
-    last_login_at TIMESTAMP NULL COMMENT '最后登录时间',
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    avatar_url VARCHAR(500),
+    bio TEXT,
+    role VARCHAR(10) DEFAULT 'user' CHECK (role IN ('admin', 'user')),
+    is_active BOOLEAN DEFAULT TRUE,
+    last_login_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_username (username),
-    UNIQUE KEY uk_email (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (username),
+    UNIQUE (email)
+);
 
 -- 7. 用户收藏表 (user_favorites)
 CREATE TABLE user_favorites (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL COMMENT '用户ID',
-    poem_id INT NOT NULL COMMENT '诗词ID',
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    poem_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (poem_id) REFERENCES poems(id) ON DELETE CASCADE,
-    UNIQUE KEY uk_user_poem (user_id, poem_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户收藏表';
+    UNIQUE (user_id, poem_id)
+);
 
 -- 8. 评论表 (comments)
 CREATE TABLE comments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL COMMENT '用户ID',
-    poem_id INT NOT NULL COMMENT '诗词ID',
-    parent_id INT DEFAULT NULL COMMENT '父评论ID（用于回复）',
-    content TEXT NOT NULL COMMENT '评论内容',
-    rating TINYINT CHECK (rating >= 1 AND rating <= 5) COMMENT '评分（1-5星）',
-    like_count INT DEFAULT 0 COMMENT '点赞数',
-    is_approved BOOLEAN DEFAULT TRUE COMMENT '是否审核通过',
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    poem_id INT NOT NULL,
+    parent_id INT DEFAULT NULL,
+    content TEXT NOT NULL,
+    rating SMALLINT CHECK (rating >= 1 AND rating <= 5),
+    like_count INT DEFAULT 0,
+    is_approved BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (poem_id) REFERENCES poems(id) ON DELETE CASCADE,
-    FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE,
-    INDEX idx_poem_created (poem_id, created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评论表';
+    FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
+);
+
+-- 为评论表创建索引
+CREATE INDEX idx_comments_poem_created ON comments(poem_id, created_at);
 
 -- 9. 浏览历史表 (view_history)
 CREATE TABLE view_history (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL COMMENT '用户ID',
-    poem_id INT NOT NULL COMMENT '诗词ID',
-    view_count INT DEFAULT 1 COMMENT '浏览次数',
-    last_viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '最后浏览时间',
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    poem_id INT NOT NULL,
+    view_count INT DEFAULT 1,
+    last_viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (poem_id) REFERENCES poems(id) ON DELETE CASCADE,
-    UNIQUE KEY uk_user_poem (user_id, poem_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='浏览历史表';
+    UNIQUE (user_id, poem_id)
+);
 
 -- 插入示例数据
 -- 插入朝代数据
@@ -161,8 +169,18 @@ INSERT INTO poets (name, pseudonym, dynasty_id, birth_year, death_year, birthpla
 ('孟浩然', NULL, 1, 689, 740, '湖北襄阳', '唐代山水田园诗派代表诗人', '清新自然', NULL),
 ('王之涣', NULL, 1, 688, 742, '山西太原', '唐代边塞诗派代表诗人', '雄浑豪放', NULL),
 ('王维', '摩诘', 1, 701, 761, '山西祁县', '唐代山水田园诗派代表，诗佛', '空灵禅意', '诗佛'),
+('白居易', '乐天', 1, 772, 846, '河南新郑', '唐代现实主义诗人，新乐府运动倡导者', '通俗易懂', '诗魔'),
+('李商隐', '义山', 1, 813, 858, '河南沁阳', '唐代著名诗人，擅长七律和七绝', '婉约含蓄', NULL),
+('杜牧', '牧之', 1, 803, 852, '陕西西安', '唐代诗人，与李商隐并称「小李杜」', '豪放俊爽', NULL),
 ('苏轼', '子瞻', 2, 1037, 1101, '四川眉山', '北宋文学家、书画家，豪放派词人代表', '豪放洒脱', '东坡居士'),
-('李清照', '易安', 2, 1084, 1155, '山东济南', '宋代女词人，婉约派代表', '婉约细腻', '易安居士');
+('李清照', '易安', 2, 1084, 1155, '山东济南', '宋代女词人，婉约派代表', '婉约细腻', '易安居士'),
+('辛弃疾', '幼安', 2, 1140, 1207, '山东济南', '南宋豪放派词人，爱国诗人', '豪放悲壮', '稼轩居士'),
+('陆游', '务观', 2, 1125, 1210, '浙江绍兴', '南宋爱国诗人，诗作数量极多', '豪放沉郁', '放翁'),
+('柳永', '耆卿', 2, 984, 1053, '福建崇安', '北宋著名词人，婉约派代表人物', '婉约缠绵', NULL),
+('晏殊', '同叔', 2, 991, 1055, '江西抚州', '北宋著名词人，婉约派代表', '婉约清新', NULL),
+('李煜', '重光', 2, 937, 978, '江苏徐州', '南唐后主，著名词人', '哀婉动人', '李后主'),
+('纳兰性德', '容若', 5, 1655, 1685, '北京', '清代著名词人，满洲正黄旗人', '婉约凄美', NULL),
+('龚自珍', '璱人', 5, 1792, 1841, '浙江杭州', '清代思想家、文学家', '豪放深沉', NULL);
 
 -- 插入标签数据
 INSERT INTO tags (name, category, description) VALUES
@@ -175,6 +193,16 @@ INSERT INTO tags (name, category, description) VALUES
 ('山水', '题材', '描写山水风景的诗词'),
 ('豪放', '风格', '豪放派诗词风格'),
 ('婉约', '风格', '婉约派诗词风格'),
-('田园', '题材', '描写田园生活的诗词');
+('田园', '题材', '描写田园生活的诗词'),
+('秋天', '季节', '描写秋天景色的诗词'),
+('冬天', '季节', '描写冬天景色的诗词'),
+('夏天', '季节', '描写夏天景色的诗词'),
+('离别', '主题', '表达离别情感的诗词'),
+('怀古', '主题', '怀念古代人事的诗词'),
+('爱国', '主题', '表达爱国情怀的诗词'),
+('饮酒', '题材', '描写饮酒的诗词'),
+('忧愁', '情感', '表达忧愁情感的诗词'),
+('欢乐', '情感', '表达欢乐情感的诗词'),
+('哲理', '主题', '蕴含哲理的诗词');
 
 COMMIT;

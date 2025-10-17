@@ -12,17 +12,31 @@
             感受中华文化的博大精深和独特魅力。
           </p>
         </div>
-        
+
         <div>
           <h3 class="text-lg font-bold mb-4">快速链接</h3>
           <ul class="space-y-2">
-            <li><a href="#home" class="text-gray-300 hover:text-accent transition-colors">首页</a></li>
-            <li><a href="#poems" class="text-gray-300 hover:text-accent transition-colors">诗词精选</a></li>
-            <li><a href="#poets" class="text-gray-300 hover:text-accent transition-colors">诗人介绍</a></li>
-            <li><a href="#about" class="text-gray-300 hover:text-accent transition-colors">关于我们</a></li>
+            <li>
+              <a href="#home" class="text-gray-300 hover:text-accent transition-colors">首页</a>
+            </li>
+            <li>
+              <a href="#poems" class="text-gray-300 hover:text-accent transition-colors"
+                >诗词精选</a
+              >
+            </li>
+            <li>
+              <a href="#poets" class="text-gray-300 hover:text-accent transition-colors"
+                >诗人介绍</a
+              >
+            </li>
+            <li>
+              <a href="#about" class="text-gray-300 hover:text-accent transition-colors"
+                >关于我们</a
+              >
+            </li>
           </ul>
         </div>
-        
+
         <div>
           <h3 class="text-lg font-bold mb-4">联系我们</h3>
           <ul class="space-y-2 text-gray-300">
@@ -41,11 +55,11 @@
           </ul>
         </div>
       </div>
-      
+
       <div class="border-t border-gray-600 mt-8 pt-8 text-center">
         <p class="text-gray-400">
-          &copy; 2024 古诗词赏析. 保留所有权利. | 
-          <a href="#" class="hover:text-accent transition-colors">隐私政策</a> | 
+          &copy; 2024 古诗词赏析. 保留所有权利. |
+          <a href="#" class="hover:text-accent transition-colors">隐私政策</a> |
           <a href="#" class="hover:text-accent transition-colors">使用条款</a>
         </p>
       </div>
@@ -61,6 +75,6 @@ export default {
 
 <style scoped>
 .bg-dark {
-  background: linear-gradient(135deg, #2F1B0A 0%, #4A3526 100%);
+  background: linear-gradient(135deg, #2f1b0a 0%, #4a3526 100%);
 }
 </style>

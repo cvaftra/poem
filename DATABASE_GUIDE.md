@@ -35,19 +35,26 @@
 
 ## 部署步骤
 
-### 1. 创建数据库
-```sql
+### 1. 创建数据库和表结构
+```bash
 mysql -u root -p < database_schema.sql
 ```
 
 ### 2. 导入示例数据
-```sql
+```bash
 mysql -u root -p < sample_data.sql
 ```
 
-### 3. 验证数据
+### 3. 运行测试验证
+```bash
+mysql -u root -p < test_database.sql
+```
+
+### 4. 手动验证数据
 ```sql
-USE poem_app;
+-- 连接数据库
+mysql -u root -p poem_app
+
 -- 查看诗词统计
 SELECT COUNT(*) as poem_count FROM poems;
 
